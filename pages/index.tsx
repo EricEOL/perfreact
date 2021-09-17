@@ -1,15 +1,39 @@
-import Link from 'next/link'
-import Layout from '../components/Layout'
+import { FormEvent, useState } from "react";
+import { SearchResults } from "../components/SearchResults";
 
-const IndexPage = () => (
-  <Layout title="Home | Next.js + TypeScript Example">
-    <h1>Hello Next.js 👋</h1>
-    <p>
-      <Link href="/about">
-        <a>About</a>
-      </Link>
-    </p>
-  </Layout>
-)
+const Home = () => {
 
-export default IndexPage
+  const [search, setSearch] = useState('');
+  const [results, setResults] = useState([]);
+
+  async function handleSearch(event: FormEvent) {
+    event.preventDefault();
+
+    if (!search.trim()) return;
+
+    const response = await fetch(`http://localhost:4333/products?q=${search}`);
+    const data = await response.json();
+
+    setResults(data);
+  }
+
+  return (
+    <div>
+      <h1>Search</h1>
+
+      <form onSubmit={handleSearch}>
+        <input
+          type="text"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+        />
+
+        <button type="submit">Buscar</button>
+      </form>
+
+      <SearchResults results={results} />
+    </div>
+  )
+}
+
+export default Home;
